@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Mindpiece01",
+  "description": "A Local-First, collaborative note-taking application powered by React, Yjs, and BlockSuite.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

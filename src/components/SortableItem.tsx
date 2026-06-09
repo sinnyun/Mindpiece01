@@ -16,8 +16,17 @@ export function SortableItem(props: { id: string; children: React.ReactNode; dis
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : 'auto',
-    opacity: isDragging ? 0.8 : 1,
   };
+
+  if (isDragging) {
+    return (
+      <div 
+        ref={setNodeRef} 
+        style={style} 
+        className="border-2 border-dashed border-primary/30 bg-primary/5 dark:bg-primary/10 rounded-[32px] h-[320px] w-full"
+      />
+    );
+  }
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>

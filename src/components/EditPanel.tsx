@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Note, Category, NoteVersion, NoteType } from '../types';
-import { X, Edit3, Plus, FileText, GitBranch, History, ChevronLeft, Check, Clock, Video, Globe, Zap, Image as ImageIcon } from 'lucide-react';
+import { X, Edit3, Plus, FileText, GitBranch, History, ChevronLeft, Check, Clock, Video, Globe, Zap, Maximize2, Minimize2, Image as ImageIcon } from 'lucide-react';
 import { BlockSuiteEditor, BlockSuiteEditorRef } from './BlockSuiteEditor';
 
 interface EditPanelProps {
@@ -26,6 +26,7 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [showVersionPanel, setShowVersionPanel] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const editorRef = useRef<BlockSuiteEditorRef>(null);
 
@@ -40,7 +41,8 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
         content: note.content
       }] : []);
 
-      setEditedNote(note ? { ...note, versions: initialVersions } : { ...emptyNote, noteType: defaultNoteType, date: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) });
+      const tempId = 'doc-' + Math.random().toString(36).substring(2, 11);
+      setEditedNote(note ? { ...note, versions: initialVersions } : { ...emptyNote, id: tempId, noteType: defaultNoteType, date: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' }) });
       setNewTag('');
       setIsAddingTag(false);
       setShowVersionPanel(false);
@@ -180,11 +182,17 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
         onClick={onClose}
       />
       
-      <div className="fixed top-4 right-4 bottom-4 flex gap-4 z-40 animate-in slide-in-from-right-8 duration-300">
+      <div className={`fixed top-4 right-4 bottom-4 flex gap-4 z-40 transition-all duration-300 ease-in-out animate-in slide-in-from-right-8 pointer-events-auto ${
+        isExpanded 
+          ? 'w-[calc(100vw-320px)]' 
+          : showVersionPanel 
+            ? 'w-[936px] max-w-[calc(100vw-32px)]' 
+            : 'w-[600px] max-w-[calc(100vw-32px)]'
+      }`}>
         
         {/* Left: Version Management Panel */}
         {showVersionPanel && (
-          <aside className="w-[320px] glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95">
+          <aside className="w-[320px] shrink-0 glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 h-full">
             <div className="px-6 py-5 border-b border-black/5 bg-white/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -229,8 +237,8 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
         )}
 
         {/* Right: Main Edit Panel */}
-        <aside className="w-[600px] glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95">
-          <div className="px-8 py-6 flex items-center justify-between border-b border-black/5 bg-white/40 shadow-sm relative z-10">
+        <aside className="glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 transition-all duration-300 flex-1 h-full w-full">
+          <div className="px-8 py-6 flex items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 shadow-sm relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 {currentType === 'video' ? <Video className="w-5 h-5" /> : currentType === 'webpage' ? <Globe className="w-5 h-5" /> : isEditing ? <Edit3 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
@@ -251,6 +259,14 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
               >
                 <GitBranch className="w-4 h-4" />
                 <span className="text-xs font-bold">版本</span>
+              </button>
+
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                title={isExpanded ? "收起面板" : "展开面板"}
+                className="p-2 flex items-center justify-center rounded-full border shadow-sm bg-white dark:bg-slate-800 text-on-surface-variant border-outline-variant/40 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5"
+              >
+                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
               
               <button 
@@ -279,7 +295,7 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
                 placeholder="输入标题..."
                 value={editedNote.title}
                 onChange={(e) => setEditedNote({...editedNote, title: e.target.value})}
-                className="w-full bg-white/50 border-none rounded-2xl px-6 py-4 text-xl font-bold text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-white/80 transition-all outline-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]"
+                className="w-full bg-white/50 dark:bg-slate-900/50 border-none rounded-2xl px-6 py-4 text-xl font-bold text-on-surface dark:text-white focus:ring-2 focus:ring-primary/20 focus:bg-white/80 dark:focus:bg-slate-900/80 transition-all outline-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]"
               />
             </div>
 
@@ -381,12 +397,15 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
 
             <div className="flex-1 flex flex-col min-h-[350px]">
               <label className="block text-xs font-bold text-primary uppercase tracking-wider px-1 mb-2">内容编辑器 (BlockSuite)</label>
-              <div className="w-full flex-1 bg-white border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-                <BlockSuiteEditor 
-                  ref={editorRef}
-                  initialContent={editedNote.content} 
-                  onChange={(val) => setEditedNote(prev => ({...prev, content: val}))} 
-                />
+              <div className="w-full flex-1 bg-white dark:bg-slate-900 border border-outline-variant/30 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                {editedNote.id && (
+                  <BlockSuiteEditor 
+                    ref={editorRef}
+                    docId={editedNote.id}
+                    initialContent={editedNote.content} 
+                    onChange={(val) => setEditedNote(prev => ({...prev, content: val}))} 
+                  />
+                )}
               </div>
             </div>
 

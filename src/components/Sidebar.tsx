@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { PlusCircle, Star, Tag, Search, Settings, Video, Globe, FileText, ChevronDown } from 'lucide-react';
-import { NoteType } from '../types';
+import { NoteType, Note } from '../types';
 
 interface SidebarProps {
   onCreateClick: (type: NoteType) => void;
+  onSettingsClick?: () => void;
+  pinnedNotes?: Note[];
+  onNoteClick?: (note: Note) => void;
 }
 
-export default function Sidebar({ onCreateClick }: SidebarProps) {
+export default function Sidebar({ onCreateClick, onSettingsClick, pinnedNotes = [], onNoteClick }: SidebarProps) {
   const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   return (
@@ -48,6 +51,28 @@ export default function Sidebar({ onCreateClick }: SidebarProps) {
           <Star className="w-5 h-5 text-tertiary" fill="currentColor" />
           <span className="text-[15px]">收藏集合</span>
         </button>
+
+        {pinnedNotes.length > 0 && (
+          <div className="mt-4 px-2 space-y-1 py-2 rounded-2xl bg-slate-50/40 dark:bg-slate-900/40 border border-slate-100/50 dark:border-white/5">
+            <div className="flex items-center gap-1.5 px-2 pb-1.5 border-b border-black/5 dark:border-white/5">
+              <Star className="w-3.5 h-3.5 text-amber-500" fill="currentColor" />
+              <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500">钉固区域 ({pinnedNotes.length})</span>
+            </div>
+            <div className="max-h-[160px] overflow-y-auto space-y-0.5 pt-1.5 creative-scrollbar scroll-smooth">
+              {pinnedNotes.map((note) => (
+                <button
+                  key={note.id}
+                  onClick={() => onNoteClick?.(note)}
+                  className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-850 text-xs text-slate-600 dark:text-slate-350 hover:text-primary dark:hover:text-primary transition-all flex items-center justify-between group"
+                >
+                  <span className="truncate font-medium flex-1 pr-1">{note.title || '无标题文字'}</span>
+                  <span className="text-[9px] text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">编辑</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface-variant hover:bg-surface-variant/50">
           <Tag className="w-5 h-5" />
           <span className="font-medium text-[15px]">标签筛选</span>
@@ -59,7 +84,10 @@ export default function Sidebar({ onCreateClick }: SidebarProps) {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-outline-variant/30">
-        <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface-variant hover:bg-surface-variant/50">
+        <button 
+          onClick={onSettingsClick}
+          className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface-variant hover:bg-surface-variant/50 cursor-pointer"
+        >
           <Settings className="w-5 h-5" />
           <span className="font-medium text-[15px]">设置</span>
         </button>

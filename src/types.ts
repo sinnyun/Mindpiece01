@@ -30,4 +30,5 @@ export interface Note {
   videoUrl?: string;
   webpageUrl?: string;
   webpageScreenshotUrl?: string;
+  isPinned?: boolean;
 }
