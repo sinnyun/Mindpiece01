@@ -18,27 +18,27 @@ export default function FloatingActionBar({ onCreateClick }: FloatingActionBarPr
       <div className="h-6 w-[1px] bg-outline-variant/40 mx-2"></div>
       <button 
         onClick={() => onCreateClick('normal')}
-        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 transition-colors"
+        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
         title="文本笔记"
       >
         <Type className="w-5 h-5" />
       </button>
       <button 
         onClick={() => onCreateClick('video')}
-        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 transition-colors"
+        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
         title="视频笔记"
       >
         <Video className="w-5 h-5" />
       </button>
       <button 
         onClick={() => onCreateClick('webpage')}
-        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 transition-colors"
+        className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
         title="网页收藏"
       >
         <Globe className="w-5 h-5" />
       </button>
       <div className="h-6 w-[1px] bg-outline-variant/40 mx-2"></div>
-      <button className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 transition-colors">
+      <button className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
         <CheckCircle className="w-5 h-5" />
       </button>
     </div>

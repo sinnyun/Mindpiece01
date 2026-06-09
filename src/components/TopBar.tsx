@@ -29,13 +29,13 @@ export default function TopBar({ searchQuery, onSearchChange }: TopBarProps) {
             placeholder="快速搜索笔记..." 
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="bg-white/50 border border-white/60 rounded-full pl-11 pr-5 py-2.5 text-sm w-72 focus:ring-2 focus:ring-primary/20 focus:bg-white/80 transition-all shadow-sm box-border outline-none"
+            className="bg-white/50 dark:bg-slate-900/50 border border-white/60 dark:border-white/10 rounded-full pl-11 pr-5 py-2.5 text-sm w-72 focus:ring-2 focus:ring-primary/20 focus:bg-white/80 dark:focus:bg-slate-900/80 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.02)] box-border outline-none text-on-surface"
           />
         </div>
         
         <button 
           onClick={toggleTheme}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/80 dark:bg-slate-800/50 dark:hover:bg-slate-700/80 transition-colors shadow-sm text-on-surface-variant"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/80 dark:bg-slate-800/50 dark:hover:bg-slate-700/80 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.02)] text-on-surface-variant"
           title={theme === 'dark' ? '切换为亮色模式' : '切换为暗色模式'}
         >
           {theme === 'dark' ? (
@@ -45,7 +45,7 @@ export default function TopBar({ searchQuery, onSearchChange }: TopBarProps) {
           )}
         </button>
 
-        <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/80 transition-colors shadow-sm">
+        <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/50 hover:bg-white/80 dark:bg-slate-800/50 dark:hover:bg-slate-700/80 transition-all shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
           <Bell className="w-5 h-5 text-on-surface-variant" />
         </button>
       </div>

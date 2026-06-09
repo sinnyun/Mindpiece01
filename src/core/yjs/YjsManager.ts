@@ -51,6 +51,10 @@ export class YjsManager {
   private isLoadedState: boolean = false;
   private listeners: Set<(loaded: boolean) => void> = new Set();
   
+  // WebSocket connection lock state
+  private isConnecting: boolean = false;
+  private reconnectTimer: any = null;
+
   // To prevent self-updates from triggering save loops
   private incomingUpdateActive = false;
 
@@ -96,6 +100,14 @@ export class YjsManager {
   }
 
   private connectSocket() {
+    if (this.isConnecting) return;
+    this.isConnecting = true;
+    
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     // Use relative path '/ws' which Vite will proxy to the watch-server on 3001
     const host = window.location.host;
@@ -107,6 +119,7 @@ export class YjsManager {
 
     ws.onopen = () => {
       console.log('[YjsManager] WebSocket connected');
+      this.isConnecting = false;
     };
 
     ws.onmessage = async (event) => {
@@ -114,7 +127,7 @@ export class YjsManager {
         const message = JSON.parse(event.data);
         if (message.type === 'BOOTSTRAP') {
           console.log('[YjsManager] Bootstrap data received:', message.data);
-          this.handleBootstrap(message.data);
+          await this.handleBootstrap(message.data);
         } else if (message.type === 'FILE_CHANGED') {
           console.log('[YjsManager] Hot-Reload External Modification:', message.path);
           await this.handleFileChanged(message.path, message.content);
@@ -130,12 +143,14 @@ export class YjsManager {
 
     ws.onclose = () => {
       console.warn('[YjsManager] WebSocket closed. Retrying in 3s...');
+      this.isConnecting = false;
+      this.ws = null;
       this.setLoaded(false);
-      setTimeout(() => this.connectSocket(), 3000);
+      this.reconnectTimer = setTimeout(() => this.connectSocket(), 3000);
     };
   }
 
-  private handleBootstrap(data: { config: any; workspace: any; chats: any[]; notes: Record<string, string> }) {
+  private async handleBootstrap(data: { config: any; workspace: any; chats: any[]; notes: Record<string, string> }) {
     this.incomingUpdateActive = true;
 
     try {
@@ -164,15 +179,17 @@ export class YjsManager {
       });
 
       // Synchronize Notes in BlockSuite collection
-      Object.entries(data.notes || {}).forEach(([docId, content]) => {
-        let page = this.blocksuiteWorkspace.getPage(docId);
-        if (!page) {
-          page = this.blocksuiteWorkspace.createPage({ id: docId });
-        }
-        
-        // Populate page with structure and blocks
-        page.load(() => {
-          // If empty, define basic visual modules
+      for (const [docId, content] of Object.entries(data.notes || {})) {
+        try {
+          let page = this.blocksuiteWorkspace.getPage(docId);
+          if (!page) {
+            page = this.blocksuiteWorkspace.createPage({ id: docId });
+          }
+          
+          await page.load();
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          // Populate page with structure and blocks
           const noteBlocks = page.getBlockByFlavour('affine:note');
           if (noteBlocks.length === 0) {
             const pageBlockId = page.addBlock('affine:page', { title: new page.Text('') });
@@ -183,16 +200,18 @@ export class YjsManager {
             // Render markdown content to paragraphs
             const lines = content.split('\n');
             lines.forEach((line) => {
-              if (line.trim() || line === '') {
+              if (line.trim()) {
                 page.addBlock('affine:paragraph', { text: new page.Text(line) }, noteId);
               }
             });
           }
-        });
 
-        // Setup individual page auto-save observation of document slot edits
-        this.setupPageObserver(page);
-      });
+          // Setup individual page auto-save observation of document slot edits
+          this.setupPageObserver(page);
+        } catch (e) {
+          console.error(`[YjsManager] Error processing page ${docId}:`, e);
+        }
+      }
 
       // Listen for newly added pages dynamically in future
       this.blocksuiteWorkspace.slots.pageAdded.on((pageId) => {
@@ -423,6 +442,7 @@ export class YjsManager {
         const noteBlock = activeNotes[0];
         noteBlock.children.forEach((model: any) => {
           const textVal = (model.text || model.title)?.toString() || '';
+          if (!textVal.trim()) return;
           if (model.flavour === 'affine:paragraph') {
             if (model.type && model.type.startsWith('h')) {
               const hLevel = parseInt(model.type.slice(1)) || 1;

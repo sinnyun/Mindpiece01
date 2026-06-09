@@ -31,20 +31,20 @@ export default function NoteCard({
   let badgeClass = "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-container";
   
   if (note.noteType === 'video') {
-    bgClass = "bg-[#f5f3ff]/90 border-purple-200/70 dark:bg-purple-950/15 dark:border-purple-800/30 text-purple-950 dark:text-purple-250";
-    badgeClass = "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
+    bgClass = "bg-[#f5f3ff]/90 border-purple-200/70 dark:bg-purple-950/40 dark:border-purple-800/60 text-purple-950 dark:text-purple-200";
+    badgeClass = "bg-purple-100 text-purple-800 dark:bg-purple-900/60 dark:text-purple-300";
   } else if (note.noteType === 'webpage') {
-    bgClass = "bg-[#f0fdfa]/90 border-teal-200/70 dark:bg-teal-950/15 dark:border-teal-800/30 text-teal-950 dark:text-teal-250";
-    badgeClass = "bg-teal-100 text-teal-800 dark:bg-teal-905/35 dark:text-teal-300";
+    bgClass = "bg-[#f0fdfa]/90 border-teal-200/70 dark:bg-teal-950/40 dark:border-teal-800/60 text-teal-950 dark:text-teal-200";
+    badgeClass = "bg-teal-100 text-teal-800 dark:bg-teal-900/60 dark:text-teal-300";
   } else if (note.category === '灵感') {
-    bgClass = "bg-[#fffbeb]/90 border-amber-200/70 dark:bg-amber-955/20 dark:border-amber-800/30 text-amber-900 dark:text-amber-200";
-    badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/35 dark:text-amber-300";
+    bgClass = "bg-[#fffbeb]/90 border-amber-200/70 dark:bg-amber-950/40 dark:border-amber-800/60 text-amber-900 dark:text-amber-200";
+    badgeClass = "bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300";
   } else if (note.category === '待办') {
-    bgClass = "bg-[#f0f9ff]/90 border-sky-200/70 dark:bg-sky-955/20 dark:border-sky-800/30 text-sky-900 dark:text-sky-200";
-    badgeClass = "bg-sky-100 text-sky-800 dark:bg-sky-900/35 dark:text-sky-300";
+    bgClass = "bg-[#f0f9ff]/90 border-sky-200/70 dark:bg-sky-950/40 dark:border-sky-800/60 text-sky-900 dark:text-sky-200";
+    badgeClass = "bg-sky-100 text-sky-800 dark:bg-sky-900/60 dark:text-sky-300";
   } else if (note.category === '随笔') {
-    bgClass = "bg-[#fff5f5]/90 border-rose-200/70 dark:bg-rose-955/20 dark:border-rose-800/30 text-rose-900 dark:text-rose-200";
-    badgeClass = "bg-rose-100 text-rose-800 dark:bg-rose-900/35 dark:text-rose-300";
+    bgClass = "bg-[#fff5f5]/90 border-rose-200/70 dark:bg-rose-950/40 dark:border-rose-800/60 text-rose-900 dark:text-rose-200";
+    badgeClass = "bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300";
   }
 
   // Fallback high-quality mock thumbnails if none assigned

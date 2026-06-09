@@ -13,7 +13,7 @@ export default function Sidebar({ onCreateClick, onSettingsClick, pinnedNotes = 
   const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   return (
-    <aside className="w-[280px] h-screen fixed left-0 top-0 bg-white/30 backdrop-blur-xl border-r border-white/40 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col py-8 px-6 z-20">
+    <aside className="w-[280px] h-screen fixed left-0 top-0 bg-white/30 dark:bg-slate-900/50 backdrop-blur-xl border-r border-white/40 dark:border-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col py-8 px-6 z-20">
       <div className="mb-12">
         <h1 className="text-2xl font-bold text-primary tracking-tight">Digital Zen</h1>
         <p className="text-sm text-on-surface-variant opacity-70 mt-1">Personal Workspace</p>

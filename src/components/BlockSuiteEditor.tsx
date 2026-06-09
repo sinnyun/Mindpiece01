@@ -11,6 +11,7 @@ interface BlockSuiteEditorProps {
 
 export interface BlockSuiteEditorRef {
   appendContent: (text: string) => void;
+  setContent: (text: string) => void;
 }
 
 export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditorProps>(
@@ -25,6 +26,28 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
         const noteId = noteIdRef.current;
         if (page && noteId) {
           page.addBlock('affine:paragraph', { text: new page.Text(text) }, noteId);
+        }
+      },
+      setContent: (text: string) => {
+        const page = pageRef.current;
+        const noteId = noteIdRef.current;
+        if (page && noteId) {
+          const blocks = page.getBlockByFlavour('affine:paragraph');
+          blocks.forEach((b: any) => {
+            try {
+              page.deleteBlock(b.id || b);
+            } catch(e) {}
+          });
+          const lines = text.split('\n');
+          if (lines.length > 0) {
+            lines.forEach((line: string) => {
+              if (line.trim()) {
+                page.addBlock('affine:paragraph', { text: new page.Text(line) }, noteId);
+              }
+            });
+          } else {
+             page.addBlock('affine:paragraph', { text: new page.Text('') }, noteId);
+          }
         }
       }
     }));

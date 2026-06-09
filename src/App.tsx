@@ -431,7 +431,7 @@ export default function App() {
   }
 
   return (
-    <div className={`flex min-h-screen text-on-surface ${theme === 'dark' ? 'bg-slate-950 text-slate-50' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`flex min-h-screen text-on-surface bg-transparent transition-colors duration-300`}>
       <Sidebar 
         onCreateClick={(type) => handleCardClick(null, type)} 
         onSettingsClick={() => setIsSettingsOpen(true)}
@@ -444,23 +444,25 @@ export default function App() {
         
         <div className="pt-32 px-10 pb-24 max-w-7xl mx-auto">
           
-          {/* Stack Breadcrumb */}
-          {stackPath.length > 0 && (
-            <div className="flex items-center gap-2 mb-6 text-sm font-medium text-on-surface-variant relative z-10">
-              <button onClick={() => setStackPath([])} className="hover:text-primary transition-colors">所有笔记</button>
-              {stackPath.map((stack, idx) => (
-                <React.Fragment key={stack.id}>
-                  <span className="text-outline-variant">/</span>
-                  <button 
-                    onClick={() => setStackPath(stackPath.slice(0, idx + 1))}
-                    className={`hover:text-primary transition-colors ${idx === stackPath.length - 1 ? 'text-on-surface' : ''}`}
-                  >
-                    {stack.title}
-                  </button>
-                </React.Fragment>
-              ))}
-            </div>
-          )}
+          {/* Stack Breadcrumb Container (Absolute positioned to prevent layout shift) */}
+          <div className="absolute top-24 left-10 mt-1 h-6">
+            {stackPath.length > 0 && (
+              <div className="flex items-center gap-2 text-sm font-medium text-on-surface-variant relative z-10 animate-in fade-in slide-in-from-left-2 duration-300">
+                <button onClick={() => setStackPath([])} className="hover:text-primary transition-colors">所有笔记</button>
+                {stackPath.map((stack, idx) => (
+                  <React.Fragment key={stack.id}>
+                    <span className="text-outline-variant">/</span>
+                    <button 
+                      onClick={() => setStackPath(stackPath.slice(0, idx + 1))}
+                      className={`hover:text-primary transition-colors ${idx === stackPath.length - 1 ? 'text-on-surface' : ''}`}
+                    >
+                      {stack.title}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Filters & Actions */}
           <div className="flex flex-col gap-4 mb-10 relative z-10">
