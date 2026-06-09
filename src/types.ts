@@ -1,4 +1,5 @@
 export type Category = '灵感' | '待办' | '随笔' | '堆栈' | '归档';
+export type NoteType = 'normal' | 'video' | 'webpage';
 
 export interface NoteVersion {
   id: string;
@@ -25,4 +26,8 @@ export interface Note {
   stackName?: string;
   versions?: NoteVersion[];
   currentVersionId?: string;
+  noteType?: NoteType;
+  videoUrl?: string;
+  webpageUrl?: string;
+  webpageScreenshotUrl?: string;
 }

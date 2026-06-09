@@ -23,13 +23,14 @@ import CardStack from './components/CardStack';
 import EditPanel from './components/EditPanel';
 import FloatingActionBar from './components/FloatingActionBar';
 import { mockNotes } from './data';
-import { Note, Category } from './types';
+import { Note, Category, NoteType } from './types';
 import { Plus, CheckSquare, X } from 'lucide-react';
 
 export default function App() {
   const [notes, setNotes] = useState<Note[]>(mockNotes);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [defaultNoteType, setDefaultNoteType] = useState<NoteType>('normal');
   
   const [activeFilter, setActiveFilter] = useState<Category | '全部笔记'>('全部笔记');
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,9 +109,10 @@ export default function App() {
     setNotes(notes.filter(n => n.id !== id && n.parentId !== id));
   };
 
-  const handleCardClick = (note: Note | null) => {
+  const handleCardClick = (note: Note | null, defaultType: NoteType = 'normal') => {
     if (!note) {
       setSelectedNote(null);
+      setDefaultNoteType(defaultType);
       setIsPanelOpen(true);
       return;
     }
@@ -160,7 +162,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen text-on-surface">
-      <Sidebar onCreateClick={() => handleCardClick(null)} />
+      <Sidebar onCreateClick={(type) => handleCardClick(null, type)} />
       
       <main className="flex-1 ml-[280px] relative">
         <TopBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -312,11 +314,12 @@ export default function App() {
           </DndContext>
         </div>
 
-        {!isSelectionMode && <FloatingActionBar onCreateClick={() => handleCardClick(null)} />}
+        {!isSelectionMode && <FloatingActionBar onCreateClick={(type) => handleCardClick(null, type)} />}
 
         <EditPanel 
           note={selectedNote} 
           isOpen={isPanelOpen} 
+          defaultNoteType={defaultNoteType}
           onClose={() => setIsPanelOpen(false)} 
           onSave={handleSaveNote}
         />

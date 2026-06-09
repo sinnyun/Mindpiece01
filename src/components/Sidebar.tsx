@@ -1,11 +1,14 @@
-import React from 'react';
-import { PlusCircle, Star, Tag, Search, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { PlusCircle, Star, Tag, Search, Settings, Video, Globe, FileText, ChevronDown } from 'lucide-react';
+import { NoteType } from '../types';
 
 interface SidebarProps {
-  onCreateClick: () => void;
+  onCreateClick: (type: NoteType) => void;
 }
 
 export default function Sidebar({ onCreateClick }: SidebarProps) {
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
+
   return (
     <aside className="w-[280px] h-screen fixed left-0 top-0 bg-white/30 backdrop-blur-xl border-r border-white/40 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col py-8 px-6 z-20">
       <div className="mb-12">
@@ -14,13 +17,33 @@ export default function Sidebar({ onCreateClick }: SidebarProps) {
       </div>
       
       <nav className="flex-1 space-y-2">
-        <button 
-          onClick={onCreateClick}
-          className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface-variant hover:bg-surface-variant/50 group"
-        >
-          <PlusCircle className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          <span className="font-medium text-[15px]">创建卡片</span>
-        </button>
+        <div className="relative relative-group">
+          <button 
+            onClick={() => setShowCreateMenu(!showCreateMenu)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-on-surface-variant hover:bg-surface-variant/50 group"
+          >
+            <div className="flex items-center gap-4">
+              <PlusCircle className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+              <span className="font-medium text-[15px]">创建卡片</span>
+            </div>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showCreateMenu ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {showCreateMenu && (
+            <div className="flex flex-col space-y-1 mt-1 pl-4 border-l-2 border-primary/20 ml-6 pb-2">
+              <button onClick={() => { onCreateClick('normal'); setShowCreateMenu(false); }} className="flex items-center gap-3 px-4 py-2 hover:bg-surface-variant/40 rounded-lg text-sm text-on-surface-variant w-full">
+                <FileText className="w-4 h-4" /> 文本笔记
+              </button>
+              <button onClick={() => { onCreateClick('video'); setShowCreateMenu(false); }} className="flex items-center gap-3 px-4 py-2 hover:bg-surface-variant/40 rounded-lg text-sm text-on-surface-variant w-full">
+                <Video className="w-4 h-4" /> 视频笔记
+              </button>
+              <button onClick={() => { onCreateClick('webpage'); setShowCreateMenu(false); }} className="flex items-center gap-3 px-4 py-2 hover:bg-surface-variant/40 rounded-lg text-sm text-on-surface-variant w-full">
+                <Globe className="w-4 h-4" /> 网页收藏
+              </button>
+            </div>
+          )}
+        </div>
+
         <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 text-on-surface hover:bg-surface-variant/50 bg-surface-variant/30 font-medium">
           <Star className="w-5 h-5 text-tertiary" fill="currentColor" />
           <span className="text-[15px]">收藏集合</span>
