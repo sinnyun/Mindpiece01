@@ -323,10 +323,12 @@ export default function App() {
          if (!page) {
            page = manager.blocksuiteWorkspace.createPage({ id: newId });
            page.load(() => {
-             const pageBlockId = page.addBlock('affine:page', { title: new page.Text('') });
+             const pageBlockId = page.addBlock('affine:page', {});
              page.addBlock('affine:surface', {}, pageBlockId);
              const noteId = page.addBlock('affine:note', {}, pageBlockId);
-             page.addBlock('affine:paragraph', { text: new page.Text(updatedNote.content || '') }, noteId);
+             const pId = page.addBlock('affine:paragraph', {}, noteId);
+             const pBlock = page.getBlockById(pId);
+             if (pBlock && pBlock.text && updatedNote.content) pBlock.text.insert(updatedNote.content, 0);
              page.resetHistory();
            });
          }

@@ -32,7 +32,7 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
   const editorRef = useRef<BlockSuiteEditorRef>(null);
 
   const currentType = editedNote.noteType || defaultNoteType;
-  const hasLeftPanel = showVersionPanel || currentType === 'video' || currentType === 'webpage';
+  const hasLeftPanel = currentType === 'video' || currentType === 'webpage';
 
   useEffect(() => {
     if (isOpen) {
@@ -195,51 +195,7 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
         }`}>
           <div className="w-[320px] mr-4 shrink-0 h-full">
             <aside className="glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 h-full">
-            {showVersionPanel ? (
-              // --- Version Panel ---
-              <>
-                <div className="px-6 py-5 border-b border-black/5 bg-white/40">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <History className="w-5 h-5 text-primary" />
-                      <h3 className="text-lg font-bold text-on-surface">版本管理</h3>
-                    </div>
-                    <button 
-                      onClick={() => setShowVersionPanel(false)}
-                      className="p-1.5 rounded-full hover:bg-black/5 text-on-surface-variant transition-colors"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-                  <div className="relative border-l-2 border-outline-variant/30 ml-3 space-y-6 pb-4 pt-2">
-                    {versionsList.map((v, idx) => (
-                      <div key={v.id} className="relative pl-6 group">
-                        <div className={`absolute -left-[5px] top-1.5 w-2 h-2 rounded-full border-2 bg-white ${v.type === 'branch' ? 'border-primary w-3 h-3 -left-[7px]' : 'border-outline-variant'} ${activeVersion === v.id ? 'bg-primary border-primary -left-[5px] w-2.5 h-2.5' : ''}`}></div>
-                        
-                        <div 
-                          className={`p-3 rounded-xl border transition-all cursor-pointer ${v.id === activeVersion ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' : v.type === 'branch' ? 'bg-primary/5 hover:bg-primary/10 border-primary/20' : 'bg-white hover:bg-surface-variant/50 border-transparent hover:border-outline-variant/20 shadow-sm'}`}
-                          onClick={() => handleLoadVersion(v)}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-1.5">
-                              {v.type === 'branch' ? <GitBranch className="w-3.5 h-3.5 text-primary" /> : <Clock className="w-3.5 h-3.5 text-on-surface-variant/60" />}
-                              <span className={`text-sm font-bold ${v.type === 'branch' ? 'text-primary' : 'text-on-surface'}`}>{v.name}</span>
-                            </div>
-                            <span className="text-xs text-on-surface-variant/70 font-medium">{v.timestamp}</span>
-                          </div>
-                          {v.type !== 'initial' && v.content && (
-                            <p className="text-xs text-on-surface-variant line-clamp-2 mt-1.5">{v.content}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : currentType === 'video' ? (
+            {currentType === 'video' ? (
               // --- Video Panel ---
               <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-none">
                 <div className="px-6 py-5 border-b border-black/5 bg-white/40">
@@ -355,14 +311,74 @@ export default function EditPanel({ note, isOpen, defaultNoteType = 'normal', on
         </div>
 
         {/* Right: Main Edit Panel */}
-        <div className={`pointer-events-auto shrink-0 transition-all duration-300 ease-in-out flex flex-col h-full ${
+        <div className={`relative pointer-events-none shrink-0 transition-all duration-300 ease-in-out flex h-full ${
           isExpanded 
             ? hasLeftPanel
               ? 'w-[calc(100vw-32px)] md:w-[calc(100vw-300px-336px)]'
               : 'w-[calc(100vw-32px)] md:w-[calc(100vw-300px)]'
             : 'w-[600px] max-w-[calc(100vw-32px)]'
         }`}>
-          <aside className="glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 shadow-2xl border border-white/20 dark:border-white/5 h-full w-full">
+          {/* Absolutely Positioned Version Panel attached to left side of Main Editor */}
+          <AnimatePresence>
+            {showVersionPanel && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-0 bottom-0 pointer-events-auto z-50 shadow-2xl rounded-3xl"
+                style={{ 
+                  left: hasLeftPanel ? '-672px' : '-336px',
+                  width: '320px'
+                }}
+              >
+                <aside className="glass-panel flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 h-full w-full rounded-3xl border border-white/20 dark:border-white/5">
+                  <div className="px-6 py-5 border-b border-black/5 bg-white/40">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <History className="w-5 h-5 text-primary" />
+                        <h3 className="text-lg font-bold text-on-surface">版本管理</h3>
+                      </div>
+                      <button 
+                        onClick={() => setShowVersionPanel(false)}
+                        className="p-1.5 rounded-full hover:bg-black/5 text-on-surface-variant transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+                    <div className="relative border-l-2 border-outline-variant/30 ml-3 space-y-6 pb-4 pt-2">
+                      {versionsList.map((v, idx) => (
+                        <div key={v.id} className="relative pl-6 group">
+                          <div className={`absolute -left-[5px] top-1.5 w-2 h-2 rounded-full border-2 bg-white ${v.type === 'branch' ? 'border-primary w-3 h-3 -left-[7px]' : 'border-outline-variant'} ${activeVersion === v.id ? 'bg-primary border-primary -left-[5px] w-2.5 h-2.5' : ''}`}></div>
+                          
+                          <div 
+                            className={`p-3 rounded-xl border transition-all cursor-pointer ${v.id === activeVersion ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/20' : v.type === 'branch' ? 'bg-primary/5 hover:bg-primary/10 border-primary/20' : 'bg-white hover:bg-surface-variant/50 border-transparent hover:border-outline-variant/20 shadow-sm'}`}
+                            onClick={() => handleLoadVersion(v)}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1.5">
+                                {v.type === 'branch' ? <GitBranch className="w-3.5 h-3.5 text-primary" /> : <Clock className="w-3.5 h-3.5 text-on-surface-variant/60" />}
+                                <span className={`text-sm font-bold ${v.type === 'branch' ? 'text-primary' : 'text-on-surface'}`}>{v.name}</span>
+                              </div>
+                              <span className="text-xs text-on-surface-variant/70 font-medium">{v.timestamp}</span>
+                            </div>
+                            {v.type !== 'initial' && v.content && (
+                              <p className="text-xs text-on-surface-variant line-clamp-2 mt-1.5">{v.content}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </aside>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <aside className="pointer-events-auto glass-panel rounded-3xl flex flex-col overflow-hidden bg-white/95 dark:bg-slate-900/95 shadow-2xl border border-white/20 dark:border-white/5 h-full w-full">
           <div className="px-8 py-6 flex items-center justify-between border-b border-black/5 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 shadow-sm relative z-10">
             <div className="flex items-center gap-3 flex-1">
               <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary">

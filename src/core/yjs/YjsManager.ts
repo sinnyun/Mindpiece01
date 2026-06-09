@@ -192,7 +192,7 @@ export class YjsManager {
           // Populate page with structure and blocks
           const noteBlocks = page.getBlockByFlavour('affine:note');
           if (noteBlocks.length === 0) {
-            const pageBlockId = page.addBlock('affine:page', { title: new page.Text('') });
+            const pageBlockId = page.addBlock('affine:page', {});
             this.blocksuiteWorkspace.setPageMeta(page.id, { title: '' });
             page.addBlock('affine:surface', {}, pageBlockId);
             const noteId = page.addBlock('affine:note', {}, pageBlockId);
@@ -201,7 +201,9 @@ export class YjsManager {
             const lines = content.split('\n');
             lines.forEach((line) => {
               if (line.trim()) {
-                page.addBlock('affine:paragraph', { text: new page.Text(line) }, noteId);
+                const blockId = page.addBlock('affine:paragraph', {}, noteId);
+                const block = page.getBlockById(blockId);
+                if (block && block.text) block.text.insert(line, 0);
               }
             });
           }
@@ -362,27 +364,33 @@ export class YjsManager {
             
             const props: any = {};
             if (shadowBlock.flavour === 'affine:code') {
-              props.text = new page.Text(shadowBlock.textVal);
               props.language = shadowBlock.language || 'text';
             } else {
-              props.text = new page.Text(shadowBlock.textVal);
               if (shadowBlock.type) props.type = shadowBlock.type;
             }
             
-            page.addBlock(shadowBlock.flavour, props, activeNote, i);
+            const addedId = page.addBlock(shadowBlock.flavour, props, activeNote, i);
+            const addedBlock = page.getBlockById(addedId);
+            if (addedBlock && (addedBlock.text || addedBlock.title)) {
+               const textObj = addedBlock.text || addedBlock.title;
+               textObj.insert(shadowBlock.textVal, 0);
+            }
           }
         } else if (shadowBlock) {
           // Shadow block is extra -> append to document end
           const props: any = {};
           if (shadowBlock.flavour === 'affine:code') {
-            props.text = new page.Text(shadowBlock.textVal);
             props.language = shadowBlock.language || 'text';
           } else {
-            props.text = new page.Text(shadowBlock.textVal);
             if (shadowBlock.type) props.type = shadowBlock.type;
           }
           
-          page.addBlock(shadowBlock.flavour, props, activeNote);
+          const addedId = page.addBlock(shadowBlock.flavour, props, activeNote);
+          const addedBlock = page.getBlockById(addedId);
+          if (addedBlock && (addedBlock.text || addedBlock.title)) {
+             const textObj = addedBlock.text || addedBlock.title;
+             textObj.insert(shadowBlock.textVal, 0);
+          }
         } else if (liveBlock) {
           // Live block is extra -> truncate / delete
           page.deleteBlock(liveBlock);

@@ -25,7 +25,9 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
         const page = pageRef.current;
         const noteId = noteIdRef.current;
         if (page && noteId) {
-          page.addBlock('affine:paragraph', { text: new page.Text(text) }, noteId);
+          const blockId = page.addBlock('affine:paragraph', {}, noteId);
+          const block = page.getBlockById(blockId);
+          if (block && block.text) block.text.insert(text, 0);
         }
       },
       setContent: (text: string) => {
@@ -42,11 +44,13 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
           if (lines.length > 0) {
             lines.forEach((line: string) => {
               if (line.trim()) {
-                page.addBlock('affine:paragraph', { text: new page.Text(line) }, noteId);
+                const blockId = page.addBlock('affine:paragraph', {}, noteId);
+                const block = page.getBlockById(blockId);
+                if (block && block.text) block.text.insert(line, 0);
               }
             });
           } else {
-             page.addBlock('affine:paragraph', { text: new page.Text('') }, noteId);
+             page.addBlock('affine:paragraph', {}, noteId);
           }
         }
       }
@@ -88,13 +92,16 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
           noteId = noteBlocks[0].id;
         } else {
           // Auto initialize default visual components if blank
-          const pageBlockId = page.addBlock('affine:page', {
-            title: new page.Text(''),
-          });
+          const pageBlockId = page.addBlock('affine:page', {});
           workspace.setPageMeta(page.id, { title: '' });
           page.addBlock('affine:surface', {}, pageBlockId);
           noteId = page.addBlock('affine:note', {}, pageBlockId);
-          page.addBlock('affine:paragraph', { text: new page.Text(initialContentRef.current || '') }, noteId);
+          
+          const paragraphId = page.addBlock('affine:paragraph', {}, noteId);
+          const paragraphBlock = page.getBlockById(paragraphId);
+          if (paragraphBlock && paragraphBlock.text && initialContentRef.current) {
+             paragraphBlock.text.insert(initialContentRef.current, 0);
+          }
           page.resetHistory();
         }
         noteIdRef.current = noteId;

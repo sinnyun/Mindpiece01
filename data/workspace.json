@@ -1,0 +1,56 @@
+{
+  "note-1": {
+    "id": "note-1",
+    "type": "file",
+    "name": "如何高效学习",
+    "parentId": "root",
+    "category": "灵感",
+    "date": "2023-10-25T10:00:00Z",
+    "tags": [
+      "学习",
+      "效率"
+    ],
+    "noteType": "normal",
+    "isPinned": true
+  },
+  "note-2": {
+    "id": "note-2",
+    "type": "file",
+    "name": "React Hooks 进阶指南",
+    "parentId": "root",
+    "category": "随笔",
+    "date": "2023-10-26T14:30:00Z",
+    "tags": [
+      "编程",
+      "React"
+    ],
+    "noteType": "video",
+    "videoUrl": "https://www.youtube.com/watch?v=dpw9EHDh2bM"
+  },
+  "note-3": {
+    "id": "note-3",
+    "type": "file",
+    "name": "Vite 官方文档摘要",
+    "parentId": "root",
+    "category": "归档",
+    "date": "2023-10-27T09:15:00Z",
+    "tags": [
+      "工具",
+      "前端"
+    ],
+    "noteType": "webpage",
+    "webpageUrl": "https://vitejs.dev/"
+  },
+  "note-4": {
+    "id": "note-4",
+    "type": "file",
+    "name": "本周核心待办",
+    "parentId": "root",
+    "category": "待办",
+    "date": "2023-10-28T08:00:00Z",
+    "tags": [
+      "计划"
+    ],
+    "noteType": "normal"
+  }
+}
