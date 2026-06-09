@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #0058be;
+  --color-primary-container: #2170e4;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fefcff;
+  --color-secondary: #006c49;
+  --color-secondary-container: #6cf8bb;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #00714d;
+  --color-tertiary: #924700;
+  --color-tertiary-container: #b75b00;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #fffbff;
+  --color-surface: #f9f9ff;
+  --color-on-surface: #191b23;
+  --color-surface-variant: #e1e2ec;
+  --color-on-surface-variant: #424754;
+  --color-outline: #727785;
+  --color-outline-variant: #c2c6d6;
+  --color-error: #ba1a1a;
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+@layer utilities {
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-md border border-white/40 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-2xl;
+  }
+}
+
+body {
+  background: radial-gradient(at 0% 0%, hsla(210,100%,98%,1) 0, transparent 50%), 
+              radial-gradient(at 50% 0%, hsla(220,100%,97%,1) 0, transparent 50%), 
+              radial-gradient(at 100% 0%, hsla(230,100%,98%,1) 0, transparent 50%);
+  background-color: #f9f9ff;
+  min-height: 100vh;
+}
