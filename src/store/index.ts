@@ -10,6 +10,7 @@ export interface WorkspaceNode {
   category?: Category;
   date?: string;
   tags?: string[];
+  summary?: string;
   noteType?: NoteType;
   videoUrl?: string;
   webpageUrl?: string;

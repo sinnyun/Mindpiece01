@@ -312,7 +312,7 @@ export class YjsManager {
       }
 
       const trimmed = line.trim();
-      if (!trimmed && line !== '') continue;
+      if (!trimmed) continue;
 
       if (trimmed.startsWith('#')) {
         const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);

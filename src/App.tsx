@@ -19,14 +19,13 @@ import {
 import { SortableItem } from './components/SortableItem';
 
 import Sidebar from './components/Sidebar';
-import TopBar from './components/TopBar';
 import NoteCard from './components/NoteCard';
 import CardStack from './components/CardStack';
 import EditPanel from './components/EditPanel';
 import SettingsModal from './components/SettingsModal';
 import FloatingActionBar from './components/FloatingActionBar';
 import { Note, Category, NoteType } from './types';
-import { Plus, CheckSquare, X, Wifi } from 'lucide-react';
+import { Plus, CheckSquare, X, Wifi, Search } from 'lucide-react';
 
 import { useSettingsStore, useWorkspaceStore } from './store';
 import { YjsManager } from './core/yjs/YjsManager';
@@ -439,24 +438,27 @@ export default function App() {
         onSettingsClick={() => setIsSettingsOpen(true)}
         pinnedNotes={notesList.filter(n => n.isPinned)}
         onNoteClick={(note) => { setSelectedNote(note); setIsPanelOpen(true); }}
+        allTags={allTags}
+        activeTag={activeTag}
+        onTagClick={setActiveTag}
+        theme={theme}
+        setTheme={useSettingsStore.getState().setTheme}
       />
       
       <main className="flex-1 ml-[280px] relative">
-        <TopBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-        
-        <div className="pt-32 px-10 pb-24 max-w-7xl mx-auto">
+        <div className="pt-14 px-10 pb-24 max-w-7xl mx-auto">
           
           {/* Stack Breadcrumb Container (Absolute positioned to prevent layout shift) */}
-          <div className="absolute top-24 left-10 mt-1 h-6">
+          <div className="absolute top-6 left-10 mt-1 h-6">
             {stackPath.length > 0 && (
-              <div className="flex items-center gap-2 text-sm font-medium text-on-surface-variant relative z-10 animate-in fade-in slide-in-from-left-2 duration-300">
-                <button onClick={() => setStackPath([])} className="hover:text-primary transition-colors">所有笔记</button>
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-500 relative z-10 animate-in fade-in slide-in-from-left-2 duration-300">
+                <button onClick={() => setStackPath([])} className="hover:text-blue-500 transition-colors">所有笔记</button>
                 {stackPath.map((stack, idx) => (
                   <React.Fragment key={stack.id}>
-                    <span className="text-outline-variant">/</span>
+                    <span className="text-slate-300">/</span>
                     <button 
                       onClick={() => setStackPath(stackPath.slice(0, idx + 1))}
-                      className={`hover:text-primary transition-colors ${idx === stackPath.length - 1 ? 'text-on-surface' : ''}`}
+                      className={`hover:text-blue-500 transition-colors ${idx === stackPath.length - 1 ? 'text-slate-800 dark:text-slate-100 font-extrabold' : ''}`}
                     >
                       {stack.title}
                     </button>
@@ -467,77 +469,68 @@ export default function App() {
           </div>
 
           {/* Filters & Actions */}
-          <div className="flex flex-col gap-4 mb-10 relative z-10">
+          <div className="flex flex-col gap-4 mb-8 mt-4 relative z-10 font-sans">
             <div className="flex items-center justify-between">
-              <div className="flex flex-wrap gap-3">
+              {/* Category Pills on the left */}
+              <div className="flex flex-wrap gap-2">
                 {filters.map(filter => (
                   <button 
                     key={filter}
                     onClick={() => { setActiveFilter(filter); setIsSelectionMode(false); setSelectedIds([]); }}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 shadow-sm ${
+                    className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all duration-200 shadow-sm border ${
                       activeFilter === filter 
-                        ? 'bg-primary text-white shadow-primary/20 animate-none' 
-                        : 'bg-white/60 dark:bg-slate-900/60 hover:bg-white/90 dark:hover:bg-slate-900/90 text-on-surface-variant border border-white/50 dark:border-slate-800/50'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/10' 
+                        : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-650 dark:text-slate-300 border-slate-200/60 dark:border-slate-800'
                     }`}
                   >
-                    {filter}
+                    {filter === '全部笔记' ? '全部笔记' : filter}
                   </button>
                 ))}
               </div>
 
-              <div className="flex gap-2">
-                {isSelectionMode ? (
-                  <>
+              {/* Search input & Combination button nested next to each other on the right */}
+              <div className="flex items-center gap-3">
+                <div className="relative flex items-center">
+                  <Search className="w-4 h-4 absolute left-3.5 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="快速搜索笔记..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-white/90 dark:bg-slate-900/90 border border-slate-200/60 dark:border-slate-800/60 rounded-full pl-9 pr-4 py-2 text-xs w-60 focus:ring-2 focus:ring-blue-500/20 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm outline-none text-slate-700 dark:text-slate-100 font-medium"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  {isSelectionMode ? (
+                    <>
+                      <button 
+                        onClick={handleGroupSelected}
+                        disabled={selectedIds.length < 2}
+                        className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${selectedIds.length >= 2 ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-600 cursor-not-allowed'}`}
+                      >
+                        组合 ({selectedIds.length})
+                      </button>
+                      <button 
+                        onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }}
+                        className="p-2 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 text-slate-500"
+                        title="取消选择"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  ) : (
                     <button 
-                      onClick={handleGroupSelected}
-                      disabled={selectedIds.length < 2}
-                      className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${selectedIds.length >= 2 ? 'bg-primary text-white shadow-sm' : 'bg-surface-variant text-on-surface-variant opacity-50 cursor-not-allowed'}`}
+                      onClick={() => setIsSelectionMode(true)}
+                      className="flex items-center gap-1.5 px-4.5 py-2 rounded-full text-xs font-bold bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 text-slate-600 dark:text-slate-350 border border-slate-200/60 dark:border-slate-850 shadow-sm transition-all"
                     >
-                      组合 ({selectedIds.length})
+                      <CheckSquare className="w-3.5 h-3.5 text-blue-500" /> 
+                      <span>选择组合</span>
                     </button>
-                    <button 
-                      onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }}
-                      className="p-2 rounded-full bg-white/60 dark:bg-slate-900/60 hover:bg-white/90 dark:hover:bg-slate-900/90 text-on-surface-variant border border-white/50 dark:border-slate-800/50"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </>
-                ) : (
-                  <button 
-                    onClick={() => setIsSelectionMode(true)}
-                    className="flex items-center gap-2 px-6 py-2 rounded-full text-sm font-medium bg-white/60 dark:bg-slate-900/60 hover:bg-white/90 dark:hover:bg-slate-900/90 text-on-surface-variant border border-white/50 dark:border-slate-800/50 shadow-sm transition-all"
-                  >
-                    <CheckSquare className="w-4 h-4" /> 选择组合
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Tag Filters */}
-            {allTags.length > 0 && (
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-xs font-bold text-on-surface-variant mr-1">标签:</span>
-                <button
-                  onClick={() => setActiveTag(null)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    activeTag === null ? 'bg-primary/20 text-primary' : 'bg-white/40 dark:bg-slate-950/40 text-on-surface-variant hover:bg-white/60 dark:hover:bg-slate-950/60'
-                  }`}
-                >
-                  全部
-                </button>
-                {allTags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => setActiveTag(tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                      activeTag === tag ? 'bg-primary/20 text-primary' : 'bg-white/40 dark:bg-slate-950/40 text-on-surface-variant hover:bg-white/60 dark:hover:bg-slate-950/60'
-                    }`}
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Grid Layout */}

@@ -18,6 +18,7 @@ export interface Note {
   category: Category;
   date: string;
   tags: string[];
+  summary?: string;
   isStack?: boolean;
   childCount?: number;
   imageUrl?: string;

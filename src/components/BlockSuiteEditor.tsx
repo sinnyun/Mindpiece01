@@ -49,9 +49,9 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
                 if (block && block.text) block.text.insert(line, 0);
               }
             });
-          } else {
-             page.addBlock('affine:paragraph', {}, noteId);
           }
+          // Automatically append an empty paragraph space row for easy inputs
+          page.addBlock('affine:paragraph', {}, noteId);
         }
       }
     }));
@@ -90,6 +90,23 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
         const noteBlocks = page.getBlockByFlavour('affine:note');
         if (noteBlocks.length > 0) {
           noteId = noteBlocks[0].id;
+          // Auto append trailing blank line if the last block is not empty
+          try {
+            const noteModel = page.getBlockById(noteId) as any;
+            if (noteModel && noteModel.children) {
+              const lastChild = noteModel.children[noteModel.children.length - 1];
+              if (lastChild) {
+                const textVal = (lastChild.text || lastChild.title)?.toString() || '';
+                if (textVal.trim() !== '') {
+                  page.addBlock('affine:paragraph', {}, noteId);
+                }
+              } else {
+                page.addBlock('affine:paragraph', {}, noteId);
+              }
+            }
+          } catch (err) {
+            console.error('[BlockSuiteEditor] Trailing space check failed:', err);
+          }
         } else {
           // Auto initialize default visual components if blank
           const pageBlockId = page.addBlock('affine:page', {});
@@ -102,6 +119,8 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
           if (paragraphBlock && paragraphBlock.text && initialContentRef.current) {
              paragraphBlock.text.insert(initialContentRef.current, 0);
           }
+          // Double-guard: ensure blank line following content
+          page.addBlock('affine:paragraph', {}, noteId);
           page.resetHistory();
         }
         noteIdRef.current = noteId;
@@ -142,8 +161,22 @@ export const BlockSuiteEditor = forwardRef<BlockSuiteEditorRef, BlockSuiteEditor
     }, [docId]);
 
     return (
-      <div className="blocksuite-container w-full h-full flex-1 overflow-auto rounded-xl bg-white dark:bg-slate-900">
-        <div ref={containerRef} className="w-full h-full min-h-[300px]" />
+      <div className="blocksuite-container w-full h-full flex-1 overflow-auto rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-inner p-4 no-scrollbar">
+        <style>{`
+          /* Hide internal BlockSuite default title, page header and tag container */
+          affine-page-header,
+          .affine-page-header,
+          .affine-page-title,
+          .affine-title-block,
+          .affine-tags-block,
+          .affine-default-header {
+            display: none !important;
+          }
+          .affine-editor-container {
+            padding-top: 4px !important;
+          }
+        `}</style>
+        <div ref={containerRef} className="w-full h-full min-h-[350px]" />
       </div>
     );
   }
